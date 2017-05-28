@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>emscripten-hunspell Demo</title>
+    <script type='text/javascript'>
+
+      // Webworker wrapper
+      function Hunspell(aff, dic, onCreate) {
+        var w = new Worker("hunspell-worker.js");
+        var spellQueue = [];
+        var suggestQueue = [];
+        w.onmessage = function(event) {
+          var data = event.data;
+          var callback = null;
+          switch(data.action) {
+            case 'ready':
+              w.postMessage({action: 'create', aff: aff, dic: dic});
+              break;
+            case 'create':
+              onCreate();
+              break;
+            case 'spell':
+              callback = spellQueue.shift();
+              callback(data.word, data.correct);
+              break;
+            case 'suggest':
+              callback = suggestQueue.shift();
+              callback(data.word, data.suggestions);
+              break;
+            default:
+              console.log('unknown action from webworker:', data.action);
+          }
+        };
+        w.onerror = console.error.bind(console);
+        this.spell = function(word, callback) {
+          spellQueue.push(callback);
+          w.postMessage({action: 'spell', word: word});
+        };
+        this.suggest = function(word, callback) {
+          suggestQueue.push(callback);
+          w.postMessage({action: 'suggest', word: word});
+        };
+      }
+
+      // Demo code
+      var log = console.log.bind(console);
+      var lang = 'en_US';
+      var hs = new Hunspell(
+        '/dictionaries/dictionaries/' + lang + '/index.aff',
+        '/dictionaries/dictionaries/' + lang + '/index.dic',
+        function onCreate() {
+          hs.spell('correct', log);
+          hs.spell('mispelled', log);
+          hs.suggest('mispelled', log);
+      });
+    </script>
+  </head>
+</html>

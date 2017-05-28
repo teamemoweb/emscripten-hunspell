@@ -1,0 +1,6 @@
+[submodule "dictionaries"]
+	path = dictionaries
+	url = ./dictionaries
+[submodule "hunspell"]
+	path = hunspell
+	url = ./hunspell
