@@ -8,7 +8,7 @@ emconfigure ./configure
 emmake make
 popd
 
-rm -r embuild
+rm -r embuild || true
 mkdir embuild
 
 em++ \
