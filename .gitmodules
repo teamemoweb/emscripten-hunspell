@@ -1,6 +1,6 @@
 [submodule "dictionaries"]
 	path = dictionaries
-	url = ./dictionaries
+	url = https://github.com/wooorm/dictionaries.git
 [submodule "hunspell"]
 	path = hunspell
-	url = ./hunspell
+	url = https://github.com/hunspell/hunspell.git
